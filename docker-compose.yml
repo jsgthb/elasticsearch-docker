@@ -25,6 +25,8 @@ services:
           bin/elasticsearch-certutil cert --silent --pem -out config/certs/certs.zip --in config/certs/instances.yml --ca-cert config/certs/ca/ca.crt --ca-key config/certs/ca/ca.key;
           unzip config/certs/certs.zip -d config/certs;
         fi;
+        echo "Creating full cert chain"
+        cat config/certs/es01/es01.crt config/certs/ca/ca.crt > config/certs/es01/es01.pem
         echo "Setting file permissions"
         chown -R 1000:1000 config/certs;
         find . -type d -exec chmod 750 \{\} \;;
@@ -36,7 +38,7 @@ services:
         echo "All done!";
       '
     healthcheck:
-      test: ["CMD-SHELL", "[ -f config/certs/es01/es01.crt ]"]
+      test: ["CMD-SHELL", "[ -f config/certs/es01/es01.pem ]"]
       interval: 1s
       timeout: 5s
       retries: 120
@@ -61,11 +63,11 @@ services:
       - xpack.security.enabled=true
       - xpack.security.http.ssl.enabled=true
       - xpack.security.http.ssl.key=certs/es01/es01.key
-      - xpack.security.http.ssl.certificate=certs/es01/es01.crt
+      - xpack.security.http.ssl.certificate=certs/es01/es01.pem
       - xpack.security.http.ssl.certificate_authorities=certs/ca/ca.crt
       - xpack.security.transport.ssl.enabled=true
       - xpack.security.transport.ssl.key=certs/es01/es01.key
-      - xpack.security.transport.ssl.certificate=certs/es01/es01.crt
+      - xpack.security.transport.ssl.certificate=certs/es01/es01.pem
       - xpack.security.transport.ssl.certificate_authorities=certs/ca/ca.crt
       - xpack.security.transport.ssl.verification_mode=certificate
       - xpack.license.self_generated.type=${LICENSE}
@@ -102,7 +104,7 @@ services:
       - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD}
       - ELASTICSEARCH_SSL_CERTIFICATEAUTHORITIES=config/certs/ca/ca.crt
       - SERVER_SSL_ENABLED=true
-      - SERVER_SSL_CERTIFICATE=config/certs/es01/es01.crt
+      - SERVER_SSL_CERTIFICATE=config/certs/es01/es01.pem
       - SERVER_SSL_KEY=config/certs/es01/es01.key
       - SERVER_SSL_CERTIFICATE_AUTHORITIES=config/certs/ca/ca.crt
       - SERVER_HOST="0.0.0.0"
