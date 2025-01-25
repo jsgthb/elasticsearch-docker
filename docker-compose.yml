@@ -111,6 +111,7 @@ services:
       - SERVER_SSL_CERTIFICATE_AUTHORITIES=config/certs/ca/ca.crt
       - SERVER_HOST="0.0.0.0"
       - XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY=${KIBANA_ENC}
+      - SERVER_PUBLICBASEURL=https://${CERT_DNS}:5601
     mem_limit: ${MEM_LIMIT_KIBANA}
     healthcheck:
       test:
